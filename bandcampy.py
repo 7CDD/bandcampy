@@ -17,9 +17,11 @@ URL = 'https://bandcamp.com/?g={genre}&s={sort_by}&p=0&gn=0&f=all&w=0&r={r}'.for
 options = webdriver.ChromeOptions()
 options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
-# GET request
+# Driver setup
 DRIVER_PATH = Path("./chromedriver.exe")
 driver = webdriver.Chrome(executable_path=DRIVER_PATH)
+
+# GET request
 driver.get(URL)
 
 # make soup

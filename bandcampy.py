@@ -18,7 +18,7 @@ options = webdriver.ChromeOptions()
 options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
 # GET request
-DRIVER_PATH = Path("./bandcampy/chromedriver.exe")
+DRIVER_PATH = Path("./chromedriver.exe")
 driver = webdriver.Chrome(executable_path=DRIVER_PATH)
 driver.get(URL)
 

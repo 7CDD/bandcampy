@@ -1,18 +1,33 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from pathlib import Path
-import time
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+import os
+from dotenv import load_dotenv
 
-# Bandcamp URL parameters
-# --------------------------------------
-# genre   - all
-# sort_by - top = (best-selling),
-#           rec = (artist-recommended),
-#           new = (new arrivals)
-# r       - most, latest
+
+def get_auth():
+    load_dotenv()
+    CLIENT_ID = os.getenv('CLIENT_ID')
+    CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+    REDIRECT_URI = os.getenv('REDIRECT_URI')
+    scope = 'user-library-read playlist-modify-public'
+    auth = SpotifyOAuth(scope=scope, cache_path='user_cache',
+                        client_id=CLIENT_ID, client_secret=CLIENT_SECRET,
+                        redirect_uri=REDIRECT_URI)
+
+    return spotipy.Spotify(auth_manager=auth)
 
 
 def build_url(genre, sort_by, page):
+    # Bandcamp URL parameters
+    # --------------------------------------
+    # genre   - all
+    # sort_by - top = (best-selling),
+    #           rec = (artist-recommended),
+    #           new = (new arrivals)
+    # r       - most, latest
     r = "most"
     return f'https://bandcamp.com/?g={genre}&s={sort_by}&p={page}&gn=0&f=all&w=0&r={r}'
 
@@ -45,13 +60,16 @@ hide_warnings()
 
 # Driver setup
 driver = init_driver()
-URL = build_url("all", "rec", 0)
+
+# GET request
+URL = build_url(genre="all", sort_by="rec", page=0)
 driver.get(URL)
 
-# GET requests
+
+# parse pages
 for page in range(0, 2):
     soup = BeautifulSoup(driver.page_source, 'html.parser')
-    print("Page: " + str(page) + " loading")
+    print("Page: ".join([str(page), " loading"]))
     artist_list = find_artist_list(soup)
     title_list = find_title_list(soup)
 
@@ -60,7 +78,20 @@ for page in range(0, 2):
 
 
 for artist, title in zip(artist_list, title_list):
-    print(artist.text + " - " + title.text)
+    print(artist.text.join([" - ", title.text]))
 
 # close webdriver
 driver.quit()
+
+# spotify api example use
+sp = get_auth()
+
+playlists = sp.user_playlists('7cdd')
+while playlists:
+    for i, playlist in enumerate(playlists['items']):
+        print("%4d %s %s" %
+              (i + 1 + playlists['offset'], playlist['uri'],  playlist['name']))
+    if playlists['next']:
+        playlists = sp.next(playlists)
+    else:
+        playlists = None

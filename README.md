@@ -8,5 +8,8 @@ We're cruisin on our scraper bike
     https://chromedriver.chromium.org/downloads
   place chromedriver.exe in project directory
 
+  pip install spotipy
+  pip install python-dotenv
   pip install selenium  
   pip install beautifulsoup4  
+

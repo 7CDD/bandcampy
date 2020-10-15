@@ -40,7 +40,7 @@ def scrape_albums(soup, page_count):
     title_list = []
     for page in range(0, page_count):
         soup = BeautifulSoup(driver.page_source, 'html.parser')
-        print(" ".join(("Page:", str(page + 1), "loading")))
+        print(f"Page: {page + 1} loading")
         driver.find_element_by_xpath(
             '//*[@id="discover"]/div[9]/div[1]/div[5]/div/a[11]').click()
         if page % 3 == 0:
@@ -55,7 +55,7 @@ def hide_warnings():
 
 
 def init_driver():
-    DRIVER_PATH = Path("./chromedriver.exe")
+    DRIVER_PATH = Path("./bandcampy/chromedriver.exe")
     return webdriver.Chrome(executable_path=DRIVER_PATH)
 
 
@@ -109,7 +109,7 @@ albums = scrape_albums(soup, pages)
 
 # print all albums in format: ARTIST - TITLE
 for artist, title in zip(*albums):
-    print(" - ".join((artist.text, title.text)))
+    print(f"{artist.text} - {title.text}")
 
 # close webdriver
 driver.quit()
@@ -128,16 +128,17 @@ if playlist.uri is None:
                             public=True, collaborative=False, description="robots")
     # update playlist with newly created playlist
     playlist = find_playlist(auth=sp, playlist_name=playlist_name)
-    print(" ".join(("created playlist:", playlist.name)))
+    print(f"created playlist: {playlist.name}")
+
 else:
-    print(" ".join(("using existing playlist:", playlist.name)))
+    print(f"using existing playlist: {playlist.name}")
 
 # use album data from bandcamp to find correlated spotify track URIs
 track_list = []
 for artist, title in zip(*albums):
     # search spotify for album
-    result = sp.search(q=" ".join(
-        (artist.text, title.text)), type="album", market="from_token")
+    result = sp.search(q=f"{artist.text} {title.text}",
+                       type="album", market="from_token")
 
     # if album found
     if len(result.get("albums").get("items")) > 0:
@@ -151,7 +152,7 @@ for artist, title in zip(*albums):
             track_list.append(track.get("uri"))
 
 # print "loading: {TOTAL_COUNT} tracks..."
-print(" ".join(("adding:", str(len(track_list)), "tracks...")))
+print(f"adding: {len(track_list)} tracks...")
 
 
 # user_playlist_add_tracks() can only add up to 100 tracks per call

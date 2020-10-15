@@ -55,7 +55,7 @@ def hide_warnings():
 
 
 def init_driver():
-    DRIVER_PATH = Path("./bandcampy/chromedriver.exe")
+    DRIVER_PATH = Path("./chromedriver.exe")
     return webdriver.Chrome(executable_path=DRIVER_PATH)
 
 
